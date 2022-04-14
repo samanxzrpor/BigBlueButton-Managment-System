@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Meetings\MeetingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -14,16 +15,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+# Show 404 Page When get Unknown Route in app
 Route::fallback(function (){
     abort(404);
 });
 
-
-
+# Authentication Default Routes
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+# When User Just Inter Site Domain Should Redirect Auth and List
+Route::get('/' , function (){ return redirect()->route('meetings.list'); });
 
-Route::get('/', function (){
-    return view('welcome');
+# All Routes Should be Use Auth Midd
+Route::middleware('auth')->group(function (){
+
+    # Meetings Process Routes
+    include __DIR__ . '/my_app/meetings.php';
 });
+

@@ -16,11 +16,11 @@ return new class extends Migration
         Schema::create('meetings', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->dateTime('run_meeting_time');
+            $table->dateTime('start_meeting_time');
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->enum('status' , ['waiting' , 'performing' , 'closed']);
+            $table->enum('status' , ['Waiting' , 'Performing' , 'Closed']);
             $table->string('meeting_data');
             $table->timestamps();
         });
