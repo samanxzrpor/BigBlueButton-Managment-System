@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Meetings\MeetingsController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -27,10 +26,13 @@ Auth::routes();
 # When User Just Inter Site Domain Should Redirect Auth and List
 Route::get('/' , function (){ return redirect()->route('meetings.list'); });
 
-# All Routes Should be Use Auth Midd
+# All Routes Should be Use Auth Middleware
 Route::middleware('auth')->group(function (){
 
     # Meetings Process Routes
     include __DIR__ . '/my_app/meetings.php';
+
+    # BBB Process Routes
+    include __DIR__ . '/bbb/meeting.php';
 });
 

@@ -17,11 +17,12 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->dateTime('start_meeting_time');
+            $table->string('during_time');
             $table->foreignId('user_id')
                 ->constrained()
                 ->cascadeOnDelete();
-            $table->enum('status' , ['Waiting' , 'Performing' , 'Closed']);
-            $table->string('meeting_data');
+            $table->enum('status' , ['Waiting' , 'Performing' , 'Closed'])->default('Waiting');
+            $table->text('meeting_data');
             $table->timestamps();
         });
     }
