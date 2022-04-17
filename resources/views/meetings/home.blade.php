@@ -24,7 +24,7 @@
                 <td>{{$meeting->title}}</td>
                 <td>{{$meeting->start_meeting_time}}</td>
                 <td>{{$meeting->user->name}}</td>
-                <td>{{$meeting->status}}</td>
+                <td><div class="btn  btn-sm btn-{{$meeting->status==='Closed'?'danger':'secondary'}}">{{$meeting->status}}</div></td>
                 <td colspan="2">
                     <a href="{{route('meetings.show', [$meeting->id])}}"><button type="button" class="btn btn-secondary btn-sm">View</button></a>
                     <a href="{{route('meetings.edit', [$meeting->id])}}"><button type="button" class="btn btn-warning btn-sm">Edit</button></a>
@@ -37,7 +37,7 @@
             </tr>
             @endforeach
             </tbody>
-            {{ $paginator->links() }}
+            {{ $meetings->links() }}
         </table>
 
     </div>

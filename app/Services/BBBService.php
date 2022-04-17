@@ -7,14 +7,17 @@ use BigBlueButton\BigBlueButton;
 use BigBlueButton\Parameters\CreateMeetingParameters;
 use BigBlueButton\Parameters\EndMeetingParameters;
 use BigBlueButton\Parameters\JoinMeetingParameters;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
+use SimpleXMLElement;
 
 
 class BBBService
 {
 
-    private $bbb;
+    private BigBlueButton $bbb;
 
+    private $meetingParams;
 
 
     public function __construct()
@@ -28,31 +31,29 @@ class BBBService
         $meetingData = unserialize($meeting->meeting_data);
         $isRecordingTrue = $meetingData['recording'] === 'on' ? true : false;
 
-
         # Set Params of BBB Request that is needed
-        $createMeetingParams = $this->getCreateMeetingParams($meeting, $meetingData, $isRecordingTrue);
+        $this->setMeetingParams($meeting, $meetingData, $isRecordingTrue);
 
-        # Create BBB Session
-        $response = $this->bbb->createMeeting($createMeetingParams);
+         # Create BBB Session
+        $response = $this->bbb->createMeeting($this->meetingParams);
 
         if ($response->getReturnCode() === 'FAILED')
             return back()->with('failed' , 'Can\'t create room! please contact our administrator.');
-
+        return $response;
     }
 
     /**
      * @param Meeting $meeting
      * @param mixed $meetingData
      * @param bool $isRecordingTrue
-     * @return CreateMeetingParameters
      */
-    public function getCreateMeetingParams(Meeting $meeting, mixed $meetingData, bool $isRecordingTrue): CreateMeetingParameters
+    public function setMeetingParams(Meeting $meeting, mixed $meetingData, bool $isRecordingTrue): void
     {
         $createMeetingParams = new CreateMeetingParameters($meetingData['meetingId'], $meeting->title);
         $createMeetingParams->setAttendeePassword($meetingData['attendeePassword']);
         $createMeetingParams->setModeratorPassword($meetingData['moderatorPassword']);
         $createMeetingParams->setDuration($meeting->during_time);
-        $createMeetingParams->setLogoutUrl(route('bbb.close'));
+        $createMeetingParams->setLogoutUrl(route('bbb.end' , [$meeting->id]));
 
         if ($isRecordingTrue) {
             $createMeetingParams->setRecord(true);
@@ -60,11 +61,11 @@ class BBBService
             $createMeetingParams->setAutoStartRecording(true);
         }
 
-        return $createMeetingParams;
+        $this->meetingParams = $createMeetingParams;
     }
 
 
-    public function getMeetings()
+    public function getMeetings(): SimpleXMLElement|RedirectResponse
     {
         $response = $this->bbb->getMeetings();
 

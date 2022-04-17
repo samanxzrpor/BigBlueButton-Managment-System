@@ -9,7 +9,7 @@ Route::prefix('bbb')->group(function (){
 
     Route::post('create/{meeting}' , [BBBController::class , 'create'])->name('bbb.create');
 
-    Route::post('close/{meeting}' , [BBBController::class , 'end'])->name('bbb.end');
+    Route::get('end/{meeting}' , [BBBController::class , 'end'])->name('bbb.end');
 
     Route::get('list' , [BBBController::class , 'list'])->name('bbb.list');
 

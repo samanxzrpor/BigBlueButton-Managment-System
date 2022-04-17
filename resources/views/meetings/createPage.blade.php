@@ -23,6 +23,10 @@
                 <input class="form-check-input" type="checkbox" name="recording">
                 <label class="form-check-label" for="flexSwitchCheckDefault">Record Meet</label>
             </div>
+            <div class="form-check form-switch" style="margin-bottom: 1em">
+                <input class="form-check-input" type="checkbox" name="need_pass">
+                <label class="form-check-label" for="flexSwitchCheckDefault">Need Password</label>
+            </div>
             <div class="mb-3">
                 <input class="form-control btn btn-success" type="submit" value="Save">
             </div>

@@ -27,7 +27,8 @@ class UpdateMeetRequest extends FormRequest
             'title' => 'nullable|min:6',
             'start-dateTime' => 'nullable|date',
             'during-time'=>'nullable|integer',
-            'recording' => 'required|string'
+            'recording'  => 'nullable',
+            'need_pass'  => 'nullable',
         ];
     }
 }

@@ -18,9 +18,10 @@ class MeetingRepository
             'during_time' => $data['during-time'],
             'meeting_data' => serialize([
                 'meetingId' => Str::slug($data['title']),
-                'attendeePassword' => Str::uuid(),
-                'moderatorPassword' => Str::uuid(),
-                'recording' => $data['recording']
+                'attendeePassword' => Str::uuid()->toString(),
+                'moderatorPassword' => Str::uuid()->toString(),
+                'recording' => $data['recording'] ?? null ,
+                'need_password' => $data['need_pass'] ?? null
             ])
         ]);
     }
@@ -30,13 +31,21 @@ class MeetingRepository
      * @param mixed $trustedData
      * @return void
      */
-    public function update(Meeting $meeting, mixed $trustedData): void
+    public function update(Meeting $meeting, mixed $data): void
     {
+        $last_meeting_data = unserialize($meeting->meeting_data);
         $meeting->update([
-            'title' => $trustedData['title'] ?? $meeting->title,
-            'start_meeting_time' => $trustedData['start_dateTime'] ?? $meeting->start_meeting_time,
+            'title' => $data['title'],
+            'start_meeting_time' => $data['start_dateTime'],
             'user_id' => Auth::user()->id,
-            'during_time' => $trustedData['during-time'] ?? $meeting->during_time,
+            'during_time' => $data['during-time'],
+            'meeting_data' => serialize([
+                'meetingId' => Str::slug($data['title']),
+                'attendeePassword'  => $last_meeting_data['attendeePassword'],
+                'moderatorPassword' => $last_meeting_data['moderatorPassword'],
+                'recording' => $data['recording'] ?? null ,
+                'need_password' => $data['need_pass'] ?? null
+            ])
         ]);
     }
 

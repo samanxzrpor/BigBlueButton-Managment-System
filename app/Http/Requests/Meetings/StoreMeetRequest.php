@@ -24,10 +24,11 @@ class StoreMeetRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required|min:6|',
+            'title' => 'required|min:6',
             'start-dateTime' => 'required|date',
             'during-time'=> 'required|integer',
-            'recording' => 'required|string'
+            'recording'  => 'nullable',
+            'need_pass'  => 'nullable',
         ];
     }
 }

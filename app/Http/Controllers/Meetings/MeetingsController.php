@@ -17,7 +17,6 @@ use function view;
 class MeetingsController extends Controller
 {
 
-
     /**
      * Show the application dashboard
      */
@@ -28,6 +27,7 @@ class MeetingsController extends Controller
         return view('meetings.home' , compact('meetings'));
     }
 
+
     /**
      * Get Create Page of Meetings
      */
@@ -35,6 +35,7 @@ class MeetingsController extends Controller
     {
         return view('meetings.createPage');
     }
+
 
     /**
      * @method POST
@@ -51,6 +52,7 @@ class MeetingsController extends Controller
         return redirect()->route('meetings.index')->with('success' , 'Session Created Successfully');
     }
 
+
     /**
      * @method GET
      * Get Show Single Meeting
@@ -60,6 +62,7 @@ class MeetingsController extends Controller
         return view('meetings.show' , compact('meeting'));
     }
 
+
     /**
      * @method GET
      * Get Show Edit Page
@@ -68,6 +71,7 @@ class MeetingsController extends Controller
     {
         return view('meetings.edit' , compact('meeting'));
     }
+
 
     /**
      * @method PUT
@@ -83,6 +87,7 @@ class MeetingsController extends Controller
         }
         return redirect()->route('meetings.index')->with('success' , 'Session Updated Successfully');
     }
+
 
     /**
      * @method DELETE
