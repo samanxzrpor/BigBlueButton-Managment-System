@@ -15,5 +15,6 @@ Route::prefix('meetings')->group(function (){
 
     Route::delete('guestLink/{meeting}' , [MeetingsController::class , 'removeGuestLink'])->name('meetings.removeGuestLink');
 
-    Route::post('attendance' , [MeetingsController::class , 'attendance'])->name('meetings.makeAttendance');
+    Route::get('{meeting}/attendance' , [MeetingsController::class , 'getAttendance'])->name('meetings.makeAttendance');
+
 });

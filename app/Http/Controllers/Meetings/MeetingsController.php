@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Meetings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Meetings\StoreMeetRequest;
 use App\Http\Requests\Meetings\UpdateMeetRequest;
+use App\Models\Attendance;
 use App\Models\Meeting;
 use App\Repositories\MeetingRepository;
 use Hashids\Hashids;
@@ -138,5 +139,8 @@ class MeetingsController extends Controller
         return back()->with('success' , 'Guest Link Deleted');
     }
 
-
+    public function getAttendance(Meeting $meeting)
+    {
+        $attendance = unserialize($meeting->attendance->users_data);
+    }
 }

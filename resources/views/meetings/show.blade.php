@@ -14,7 +14,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col">
-                        <a href="{{route('bbb.participants' , [$meeting->id])}}"><button class="btn btn-dark">User Sessions</button></a>
+                        <a href="{{route('meetings.makeAttendance' , [$meeting->id])}}"><button class="btn btn-dark">User Sessions</button></a>
                     </div>
                 </div>
             </div>

@@ -15,5 +15,4 @@ Route::prefix('bbb')->group(function (){
 
     Route::post('join/{meeting}' , [BBBController::class , 'join'])->name('bbb.join');
 
-    Route::get('participants/{meeting}' , [BBBController::class , 'attendanceLog'])->name('bbb.participants');
 });

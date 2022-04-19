@@ -4,6 +4,7 @@ namespace App\Http\Controllers\BBB;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Meetings\AttendenceController;
+use App\Models\Attendance;
 use App\Models\Meeting;
 use App\Services\BBBService;
 use BigBlueButton\Exceptions\BadResponseException;
@@ -60,13 +61,18 @@ class BBBController extends Controller
     {
         $meetingData = unserialize($meeting->meeting_data);
 
-        if (is_null($meetingData['need_password']) && is_null($password))
-            $password = Auth::user()->id === $meeting->user_id ? $meetingData['moderatorPassword'] : $meetingData['attendeePassword'];
+        try {
+            if (is_null($meetingData['need_password']) && is_null($password))
+                $password = Auth::user()->id === $meeting->user_id ? $meetingData['moderatorPassword'] : $meetingData['attendeePassword'];
 
-        $url = $this->bbb->joinMeeting(
-            $meetingData['meetingId'] ,
-            Auth::user()->name ,
-            $password);
+            $url = $this->bbb->joinMeeting(
+                $meetingData['meetingId'] ,
+                Auth::user()->name ,
+                $password);
+
+        }catch (\Exception $e) {
+            return back()->with('failed' , 'Error In Join Meeting :' . $e->getMessage());
+        }
 
         return redirect($url);
     }
@@ -76,8 +82,11 @@ class BBBController extends Controller
     {
         $meetingData = unserialize($meeting->meeting_data);
 
+        if(Auth::user()->id !== $meeting->user_id)
+            return back()->with('failed' , 'You are Not this Meeting Moderator');
+
         # Save Attendance Log in database
-//        (new AttendenceController())->setAttendance((array)$this->attendanceLog($meeting));
+        $this->setAttendanceLog($meeting);
 
         # End the session both through the bbb environment and the end button on the single page
         $response = $this->bbb->endMeeting(
@@ -95,18 +104,50 @@ class BBBController extends Controller
     }
 
 
-//    public function attendanceLog(Meeting $meeting)
-//    {
-//        $meetingData = unserialize($meeting->meeting_data);
-//
-//        if(Auth::user()->id !== $meeting->user_id)
-//            return back()->with('failed' , 'You are Not this Meeting Moderator');
-//
-//        $response = $this->bbb->getMeetingData($meetingData['meetingId'] , $meetingData['moderatorPassword']);
-//
-//        (new AttendenceController())->setAttendance((array)$response->attendees[0]);
-//
-//        return $response->attendees[0];
-//    }
+    /**
+     *
+     *
+     * @param Meeting $meeting
+     *
+     * @return RedirectResponse|void
+     */
+    public function setAttendanceLog(Meeting $meeting)
+    {
+        $meetingData = unserialize($meeting->meeting_data);
+
+        #Get All Users That Have been present In Meeting From Meeting Information
+        $attendeesToSave = $this->getAttendeesFromMeeting($meetingData);
+
+        # save Attendance Log in Database
+        Attendance::create([
+            'meeting_id' => $meeting->id,
+            'users_data' => serialize($attendeesToSave)
+        ]);
+    }
+
+
+    /**
+     * Get All Users That Have been present In Meeting From Meeting Information
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    public function getAttendeesFromMeeting(array $data): array
+    {
+        $attendeesToSave = [];
+
+        $response = $this->bbb->getMeetingData($data['meetingId'] , $data['moderatorPassword']);
+
+        foreach ($response->attendees[0] as $attendee) {
+            $json = json_encode($attendee);
+            $attendee = json_decode($json,TRUE);
+            $attendeesToSave[] = [
+                'user_session' => $attendee['userID'],
+                'name' => $attendee['fullName'],
+            ];
+        }
+        return $attendeesToSave;
+    }
 
 }

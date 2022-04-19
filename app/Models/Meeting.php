@@ -17,4 +17,9 @@ class Meeting extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function attendance()
+    {
+        return $this->hasOne(Attendance::class);
+    }
 }
