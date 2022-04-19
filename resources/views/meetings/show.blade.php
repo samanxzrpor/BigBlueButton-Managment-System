@@ -21,19 +21,28 @@
             <br><br>
             <div class="container">
                 <div class="row">
-                    <div class="col">
+                    @if(is_null($meeting->guest_link))
+                    <div class="col-2" style="margin-top: 1.5em;">
                         <form action="{{route('meetings.setGuestLink' , [$meeting->id])}}" method="post">
                             @csrf
                             <button type="submit" class="btn btn-warning">Make Guest Link</button>
                         </form>
                     </div>
-                    <div class="col">
-                        @if(!is_null($meeting->guest_link))
+                    @endif
+                    @if(!is_null($meeting->guest_link))
+                    <div class="col-2" style="margin-top: 1.5em;">
+                        <form action="{{route('meetings.removeGuestLink' , [$meeting->id])}}" method="post">
+                            @csrf
+                            @method('delete')
+                            <button type="submit" class="btn btn-danger">Remove Guest Link</button>
+                        </form>
+                    </div>
+                    <div class="col-10">
                             <div class="alert alert-warning" role="alert">
                                 {{$meeting->guest_link}}
                             </div>
-                        @endif
                     </div>
+                    @endif
                 </div>
             </div>
 

@@ -42,6 +42,7 @@ class MeetingsController extends Controller
 
     /**
      * @method POST
+     *
      * Store Meeting in Database
      */
     public function store(StoreMeetRequest $request): RedirectResponse
@@ -58,6 +59,7 @@ class MeetingsController extends Controller
 
     /**
      * @method GET
+     *
      * Get Show Single Meeting
      */
     public function show(Meeting $meeting): View
@@ -68,6 +70,7 @@ class MeetingsController extends Controller
 
     /**
      * @method GET
+     *
      * Get Show Edit Page
      */
     public function edit(Meeting $meeting): View
@@ -78,6 +81,7 @@ class MeetingsController extends Controller
 
     /**
      * @method PUT
+     *
      * Update Meeting Data in Database
      */
     public function update(Meeting $meeting , UpdateMeetRequest $request): RedirectResponse
@@ -94,6 +98,7 @@ class MeetingsController extends Controller
 
     /**
      * @method DELETE
+     *
      * Delete one Meeting of Database
      */
     public function destroy(Meeting $meeting): RedirectResponse
@@ -103,19 +108,14 @@ class MeetingsController extends Controller
     }
 
 
-    public function setGuestLink(Meeting $meeting)
+    /**
+     * @method POST
+     *
+     * Create And Save Guest Link in Meeting Table
+     */
+    public function setGuestLink(Meeting $meeting): RedirectResponse
     {
-        $meetingData = unserialize($meeting->meeting_data);
-        $requiredParamsToJoin = [
-            'meetingID' => $meetingData['meetingId'],
-            'fullName' => Str::random(13),
-            'password' => $meetingData['attendeePassword'],
-            'redirect'=> 'true'
-        ];
-
-        $queryBuild = http_build_query($requiredParamsToJoin);
-        $checkSum = sha1('join' .$queryBuild . env('BBB_SECRET'));
-        $guestLink = env('BBB_SERVER_BASE_URL') . 'api/join?' . $queryBuild . '&checksum=' . $checkSum;
+        $guestLink = resolve(MeetingRepository::class)->makeGuestLink($meeting);
 
         $meeting->update([
             'guest_link' => $guestLink,
@@ -123,5 +123,20 @@ class MeetingsController extends Controller
 
         return back()->with('success' , 'Guest Link Generated');
     }
+
+
+    /**
+     * @method DELETE
+     *
+     * Remove Guest Link in Meeting Table
+     */
+    public function removeGuestLink(Meeting $meeting): RedirectResponse
+    {
+        $meeting->update([
+            'guest_link' => null,
+        ]);
+        return back()->with('success' , 'Guest Link Deleted');
+    }
+
 
 }

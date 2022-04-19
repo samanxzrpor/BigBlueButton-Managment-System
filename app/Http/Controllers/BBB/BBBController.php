@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\BBB;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Meetings\AttendenceController;
 use App\Models\Meeting;
 use App\Services\BBBService;
 use BigBlueButton\Exceptions\BadResponseException;
@@ -31,8 +32,12 @@ class BBBController extends Controller
             if ($meeting->start_meeting_time < now())
                 throw new Exception('it is past the start time of the meeting');
 
+            # Throw Exception If Another User Want to create Moderator Meeting
+            if ($meeting->user->id !== Auth::user()->id)
+                throw new Exception('This Meetings Moderator is not allowed to You');
+
             # Create Meeting in BBB Server
-            $this->bbb->createSession($meeting);
+            $this->bbb->createEnvironment($meeting);
 
         }catch (BadResponseException|Exception $e) {
             return back()->with('failed' , 'Can not create meeting :' . $e->getMessage());
@@ -71,6 +76,9 @@ class BBBController extends Controller
     {
         $meetingData = unserialize($meeting->meeting_data);
 
+        # Save Attendance Log in database
+//        (new AttendenceController())->setAttendance((array)$this->attendanceLog($meeting));
+
         # End the session both through the bbb environment and the end button on the single page
         $response = $this->bbb->endMeeting(
             $meetingData['meetingId'] ,
@@ -87,15 +95,18 @@ class BBBController extends Controller
     }
 
 
-    public function participantsLog(Meeting $meeting)
-    {
-        $meetingData = unserialize($meeting->meeting_data);
-
-        if(Auth::user()->id !== $meeting->user_id)
-            return back()->with('failed' , 'You are Not this Meeting Moderator');
-
-        $response = $this->bbb->getMeetingData($meetingData['meetingId'] , $meetingData['moderatorPassword']);
-
-    }
+//    public function attendanceLog(Meeting $meeting)
+//    {
+//        $meetingData = unserialize($meeting->meeting_data);
+//
+//        if(Auth::user()->id !== $meeting->user_id)
+//            return back()->with('failed' , 'You are Not this Meeting Moderator');
+//
+//        $response = $this->bbb->getMeetingData($meetingData['meetingId'] , $meetingData['moderatorPassword']);
+//
+//        (new AttendenceController())->setAttendance((array)$response->attendees[0]);
+//
+//        return $response->attendees[0];
+//    }
 
 }

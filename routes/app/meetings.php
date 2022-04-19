@@ -13,5 +13,7 @@ Route::prefix('meetings')->group(function (){
 
     Route::post('guestLink/{meeting}' , [MeetingsController::class , 'setGuestLink'])->name('meetings.setGuestLink');
 
-//    Route::get('guestLink/{meeting}' , [MeetingsController::class , 'getGuestLink'])->name('meetings.getGuestLink');
+    Route::delete('guestLink/{meeting}' , [MeetingsController::class , 'removeGuestLink'])->name('meetings.removeGuestLink');
+
+    Route::post('attendance' , [MeetingsController::class , 'attendance'])->name('meetings.makeAttendance');
 });

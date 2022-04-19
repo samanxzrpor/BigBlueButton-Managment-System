@@ -27,7 +27,7 @@ class BBBService
     }
 
 
-    public function createSession(Meeting $meeting)
+    public function createEnvironment(Meeting $meeting)
     {
         $meetingData = unserialize($meeting->meeting_data);
         $isRecordingTrue = $meetingData['recording'] === 'on' ? true : false;

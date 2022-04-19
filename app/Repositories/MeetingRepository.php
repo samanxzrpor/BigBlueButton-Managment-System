@@ -49,4 +49,24 @@ class MeetingRepository
         ]);
     }
 
+
+    /**
+     * @param Meeting $meeting
+     * @return string
+     */
+    public function makeGuestLink(Meeting $meeting): string
+    {
+        $meetingData = unserialize($meeting->meeting_data);
+        $requiredParamsToJoin = [
+            'meetingID' => $meetingData['meetingId'],
+            'fullName' => Str::random(13),
+            'password' => $meetingData['attendeePassword'],
+            'redirect' => 'true'
+        ];
+
+        $queryBuild = http_build_query($requiredParamsToJoin);
+        $checkSum = sha1('join' . $queryBuild . env('BBB_SECRET'));
+        return env('BBB_SERVER_BASE_URL') . 'api/join?' . $queryBuild . '&checksum=' . $checkSum;
+    }
+
 }
