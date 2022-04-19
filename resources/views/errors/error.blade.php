@@ -14,5 +14,5 @@
 @endif
 
 @if(session('failed'))
-    <div class="alert alert-danger">{{session('error')}}</div>
+    <div class="alert alert-danger">{{session('failed')}}</div>
 @endif

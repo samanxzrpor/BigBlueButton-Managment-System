@@ -8,9 +8,35 @@
             <hr><br>
             <h5>Meeting Moderator : {{$meeting->user->name}}</h5>
             <h5>Meeting Start Time : {{$meeting->start_meeting_time}}</h5>
-            <h6>Meeting During Time : {{$meeting->during_time}} Hour</h6>
+            <h6>Meeting During Time : {{$meeting->during_time}} Minutes</h6>
 
-            <button class="btn btn-{{$meeting->status==='Closed'?'danger':'secondary'}}">{{$meeting->status}}</button>
+            <button class="alert alert-{{$meeting->status==='Closed'?'danger':'secondary'}}">{{$meeting->status}}</button>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <a href="{{route('bbb.participants' , [$meeting->id])}}"><button class="btn btn-dark">User Sessions</button></a>
+                    </div>
+                </div>
+            </div>
+            <br><br>
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <form action="{{route('meetings.setGuestLink' , [$meeting->id])}}" method="post">
+                            @csrf
+                            <button type="submit" class="btn btn-warning">Make Guest Link</button>
+                        </form>
+                    </div>
+                    <div class="col">
+                        @if(!is_null($meeting->guest_link))
+                            <div class="alert alert-warning" role="alert">
+                                {{$meeting->guest_link}}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+
             <div class="fixed-bottom" style="margin:4em 7em">
                 @if($meeting->status === 'Waiting')
                     <form action="{{route('bbb.create' , [$meeting->id])}}" method="post">
@@ -36,7 +62,7 @@
                             <button type="submit" class="btn btn-warning">Join Meeting</button>
                         </form>
                     @endif
-                    <form action="{{route('bbb.end' , [$meeting->id])}}" method="post" style="display: inline;">
+                    <form action="{{route('bbb.end' , [$meeting->id])}}" method="get" style="display: inline;">
                         @csrf
                         <button type="submit" class="btn btn-danger" >End Meeting</button>
                     </form>

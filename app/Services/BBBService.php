@@ -6,6 +6,7 @@ use App\Models\Meeting;
 use BigBlueButton\BigBlueButton;
 use BigBlueButton\Parameters\CreateMeetingParameters;
 use BigBlueButton\Parameters\EndMeetingParameters;
+use BigBlueButton\Parameters\GetMeetingInfoParameters;
 use BigBlueButton\Parameters\JoinMeetingParameters;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
@@ -88,6 +89,18 @@ class BBBService
     {
         $endMeetingParams = new EndMeetingParameters($meetingID, $moderator_password);
         return $this->bbb->endMeeting($endMeetingParams);
+    }
+
+
+    public function getMeetingData(mixed $meetingID,string $moderator_password): SimpleXMLElement|RedirectResponse
+    {
+        $getMeetingInfoParams = new GetMeetingInfoParameters($meetingID, $moderator_password);
+        $response = $this->bbb->getMeetingInfo($getMeetingInfoParams);
+
+        if ($response->getReturnCode() === 'FAILED')
+            return back()->with('failed' , $response->getMessage());
+
+        return $response->getRawXml();
     }
 
 }

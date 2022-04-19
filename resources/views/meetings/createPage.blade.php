@@ -16,8 +16,8 @@
                 <input class="form-control" name="start-dateTime" type="datetime-local" placeholder="Default input">
             </div>
             <div class="mb-3">
-                <label for="during-time" class="form-label">During Time Meeting(0 - 24)</label>
-                <input class="form-control" name="during-time" type="range" min="0" max="24">
+                <label for="during-time" class="form-label">During Time Meeting(Minute)</label>
+                <input class="form-control" name="during-time" type="number">
             </div>
             <div class="form-check form-switch" style="margin-bottom: 1em">
                 <input class="form-check-input" type="checkbox" name="recording">

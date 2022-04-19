@@ -16,9 +16,10 @@
                     <label for="exampleFormControlInput1" class="form-label">Date and Time for Start Meeting</label>
                     <input class="form-control" name="start-dateTime" type="datetime-local" value="{{str_replace(' ' , 'T',$meeting->start_meeting_time)}}">
                 </div>
+
                 <div class="mb-3">
-                    <label for="during-time" class="form-label">During Time Meeting(0 - 24)</label>
-                    <input class="form-control" name="during-time" type="range" value="{{$meeting->during_time}}" min="0" max="24">
+                    <label for="during-time" class="form-label">During Time Meeting(Minute)</label>
+                    <input class="form-control" name="during-time" value="{{$meeting->during_time}}" type="number">
                 </div>
                 <div class="form-check form-switch" style="margin-bottom: 1em">
                     <input class="form-check-input" type="checkbox" {{unserialize($meeting->meeting_data)['recording']==='on' ? 'checked' : ''}} name="recording">

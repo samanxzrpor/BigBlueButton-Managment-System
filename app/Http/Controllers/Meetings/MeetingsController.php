@@ -7,8 +7,10 @@ use App\Http\Requests\Meetings\StoreMeetRequest;
 use App\Http\Requests\Meetings\UpdateMeetRequest;
 use App\Models\Meeting;
 use App\Repositories\MeetingRepository;
+use Hashids\Hashids;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function view;
@@ -16,6 +18,7 @@ use function view;
 
 class MeetingsController extends Controller
 {
+
 
     /**
      * Show the application dashboard
@@ -97,6 +100,28 @@ class MeetingsController extends Controller
     {
         $meeting->delete();
         return back()->with('success' , 'Session has been deleted');
+    }
+
+
+    public function setGuestLink(Meeting $meeting)
+    {
+        $meetingData = unserialize($meeting->meeting_data);
+        $requiredParamsToJoin = [
+            'meetingID' => $meetingData['meetingId'],
+            'fullName' => Str::random(13),
+            'password' => $meetingData['attendeePassword'],
+            'redirect'=> 'true'
+        ];
+
+        $queryBuild = http_build_query($requiredParamsToJoin);
+        $checkSum = sha1('join' .$queryBuild . env('BBB_SECRET'));
+        $guestLink = env('BBB_SERVER_BASE_URL') . 'api/join?' . $queryBuild . '&checksum=' . $checkSum;
+
+        $meeting->update([
+            'guest_link' => $guestLink,
+        ]);
+
+        return back()->with('success' , 'Guest Link Generated');
     }
 
 }

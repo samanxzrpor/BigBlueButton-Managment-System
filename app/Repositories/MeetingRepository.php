@@ -36,7 +36,7 @@ class MeetingRepository
         $last_meeting_data = unserialize($meeting->meeting_data);
         $meeting->update([
             'title' => $data['title'],
-            'start_meeting_time' => $data['start_dateTime'],
+            'start_meeting_time' => $data['start-dateTime'],
             'user_id' => Auth::user()->id,
             'during_time' => $data['during-time'],
             'meeting_data' => serialize([
