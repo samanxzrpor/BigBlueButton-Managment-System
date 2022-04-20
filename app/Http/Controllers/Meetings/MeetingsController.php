@@ -27,7 +27,6 @@ class MeetingsController extends Controller
     public function index(): View
     {
         $meetings = Meeting::orderByDesc('created_at')->paginate(12);
-
         return view('meetings.home' , compact('meetings'));
     }
 
