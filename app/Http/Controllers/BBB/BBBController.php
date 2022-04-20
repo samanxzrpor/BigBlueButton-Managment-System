@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\Auth;
+use JsonException;
 
 class BBBController extends Controller
 {
@@ -57,6 +58,12 @@ class BBBController extends Controller
     }
 
 
+    /**
+     * Joined Meeting That created in past
+     * @param Meeting $meeting
+     * @param string|null $password
+     * @return Redirector|RedirectResponse
+     */
     public function join(Meeting $meeting, string $password = null): Redirector|RedirectResponse
     {
         $meetingData = unserialize($meeting->meeting_data);
@@ -78,7 +85,13 @@ class BBBController extends Controller
     }
 
 
-    public function end(Meeting $meeting)
+    /**
+     * Meeting Moderator Can Finish Meeting and generate Meeting Attendance
+     * @param Meeting $meeting
+     * @return RedirectResponse
+     * @throws JsonException
+     */
+    public function end(Meeting $meeting): RedirectResponse
     {
         $meetingData = unserialize($meeting->meeting_data);
 
@@ -105,13 +118,11 @@ class BBBController extends Controller
 
 
     /**
-     *
-     *
      * @param Meeting $meeting
-     *
-     * @return RedirectResponse|void
+     * @return void
+     * @throws JsonException
      */
-    public function setAttendanceLog(Meeting $meeting)
+    public function setAttendanceLog(Meeting $meeting): void
     {
         $meetingData = unserialize($meeting->meeting_data);
 
@@ -128,10 +139,9 @@ class BBBController extends Controller
 
     /**
      * Get All Users That Have been present In Meeting From Meeting Information
-     *
      * @param array $data
-     *
      * @return array
+     * @throws JsonException
      */
     public function getAttendeesFromMeeting(array $data): array
     {
@@ -140,8 +150,9 @@ class BBBController extends Controller
         $response = $this->bbb->getMeetingData($data['meetingId'] , $data['moderatorPassword']);
 
         foreach ($response->attendees[0] as $attendee) {
-            $json = json_encode($attendee);
-            $attendee = json_decode($json,TRUE);
+
+            $json = json_encode($attendee, JSON_THROW_ON_ERROR);
+            $attendee = json_decode($json, TRUE, 512, JSON_THROW_ON_ERROR);
             $attendeesToSave[] = [
                 'user_session' => $attendee['userID'],
                 'name' => $attendee['fullName'],

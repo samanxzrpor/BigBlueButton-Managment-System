@@ -139,8 +139,18 @@ class MeetingsController extends Controller
         return back()->with('success' , 'Guest Link Deleted');
     }
 
-    public function getAttendance(Meeting $meeting)
+
+    /**
+     * Get Meetings Attendance
+     *
+     * @param Meeting $meeting
+     *
+     * @return View
+     */
+    public function getAttendance(Meeting $meeting): View
     {
         $attendance = unserialize($meeting->attendance->users_data);
+
+        return view('meetings.attendance', compact('attendance'));
     }
 }

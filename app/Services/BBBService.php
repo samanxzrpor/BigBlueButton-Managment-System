@@ -8,6 +8,8 @@ use BigBlueButton\Parameters\CreateMeetingParameters;
 use BigBlueButton\Parameters\EndMeetingParameters;
 use BigBlueButton\Parameters\GetMeetingInfoParameters;
 use BigBlueButton\Parameters\JoinMeetingParameters;
+use BigBlueButton\Responses\CreateMeetingResponse;
+use BigBlueButton\Responses\EndMeetingResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use SimpleXMLElement;
@@ -21,13 +23,19 @@ class BBBService
     private $meetingParams;
 
 
+
     public function __construct()
     {
         $this->bbb = new BigBlueButton(env('BBB_SERVER_BASE_URL') , env('BBB_SECRET'));
     }
 
 
-    public function createEnvironment(Meeting $meeting)
+    /**
+     * Create Meeting Environment in BBB Server
+     * @param Meeting $meeting
+     * @return CreateMeetingResponse|RedirectResponse
+     */
+    public function createEnvironment(Meeting $meeting): CreateMeetingResponse|RedirectResponse
     {
         $meetingData = unserialize($meeting->meeting_data);
         $isRecordingTrue = $meetingData['recording'] === 'on' ? true : false;
@@ -42,6 +50,7 @@ class BBBService
             return back()->with('failed' , 'Can\'t create room! please contact our administrator.');
         return $response;
     }
+
 
     /**
      * @param Meeting $meeting
@@ -66,6 +75,10 @@ class BBBService
     }
 
 
+    /**
+     * Get All Meeting that now running in BBBServer
+     * @return SimpleXMLElement|RedirectResponse
+     */
     public function getMeetings(): SimpleXMLElement|RedirectResponse
     {
         $response = $this->bbb->getMeetings();
@@ -85,7 +98,7 @@ class BBBService
     }
 
 
-    public function endMeeting(mixed $meetingID,string $moderator_password)
+    public function endMeeting(mixed $meetingID,string $moderator_password): EndMeetingResponse
     {
         $endMeetingParams = new EndMeetingParameters($meetingID, $moderator_password);
         return $this->bbb->endMeeting($endMeetingParams);

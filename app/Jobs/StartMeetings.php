@@ -39,6 +39,7 @@ class StartMeetings implements ShouldQueue
     {
         foreach (Meeting::all() as $meeting) {
             if ($meeting->start_meeting_time === now()->format('Y-m-d H:i').':00') {
+
                 # Create Meeting in BBB Server
                 $this->bbb->createEnvironment($meeting);
 
