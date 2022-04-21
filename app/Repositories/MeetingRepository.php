@@ -28,7 +28,7 @@ class MeetingRepository
 
     /**
      * @param Meeting $meeting
-     * @param mixed $trustedData
+     * @param mixed $data
      * @return void
      */
     public function update(Meeting $meeting, mixed $data): void

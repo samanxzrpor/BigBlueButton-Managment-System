@@ -20,41 +20,16 @@ class BBBController extends Controller
 
     private BBBService $bbb;
 
-    # Initialize BBB Service
-    public function __construct(BBBService $bbb)
+    public function __construct()
     {
-        $this->bbb = $bbb;
+        $this->bbb = new BBBService();
     }
-
 
     public function create(Meeting $meeting)
     {
-        try {
-            # Throw Exception If it is past the start time of the meeting
-            if ($meeting->start_meeting_time < now())
-                throw new Exception('it is past the start time of the meeting');
-
-            # Throw Exception If Another User Want to create Moderator Meeting
-            if ($meeting->user->id !== Auth::user()->id)
-                throw new Exception('This Meetings Moderator is not allowed to You');
-
-            # Create Meeting in BBB Server
-            $this->bbb->createEnvironment($meeting);
-
-        }catch (BadResponseException|Exception $e) {
-            return back()->with('failed' , 'Can not create meeting :' . $e->getMessage());
-        }
-        # change Meeting Status in our Database
-        $meeting->update([
-            'status' => 'Performing'
-        ]);
+        $this->createMeetingEnvironment($meeting);
+        $this->updateStatus($meeting ,'Performing');
         return back()->with('success' , 'You Can Join Meeting');
-    }
-
-
-    public function list()
-    {
-        dd($this->bbb->getMeetings());
     }
 
 
@@ -93,26 +68,13 @@ class BBBController extends Controller
      */
     public function end(Meeting $meeting): RedirectResponse
     {
-        $meetingData = unserialize($meeting->meeting_data);
-
-        if(Auth::user()->id !== $meeting->user_id)
-            return back()->with('failed' , 'You are Not this Meeting Moderator');
-
         # Save Attendance Log in database
         $this->setAttendanceLog($meeting);
+        # End Meeting
+        $this->endMeetingEnvironment($meeting);
+        #upadte Meeting Status in Database
+        $this->updateStatus($meeting ,'Closed');
 
-        # End the session both through the bbb environment and the end button on the single page
-        $response = $this->bbb->endMeeting(
-            $meetingData['meetingId'] ,
-            $meeting->title,
-            $meetingData['moderatorPassword']);
-
-        if ($response->getReturnCode() === 'FAILED')
-            return back()->with('failed' , $response->getMessage());
-
-        $meeting->update([
-            'status' => 'Closed'
-        ]);
         return back()->with('success', 'Meeting Closed successfully');
     }
 
@@ -161,4 +123,48 @@ class BBBController extends Controller
         return $attendeesToSave;
     }
 
+    private function createMeetingEnvironment(Meeting $meeting)
+    {
+        try {
+            # Throw Exception If it is past the start time of the meeting
+            if ($meeting->start_meeting_time < now())
+                throw new Exception('it is past the start time of the meeting');
+
+            # Throw Exception If Another User Want to create Moderator Meeting
+            if ($meeting->user->id !== Auth::user()->id)
+                throw new Exception('This Meetings Moderator is not allowed to You');
+
+            # Create Meeting in BBB Server
+            $this->bbb->createEnvironment($meeting);
+
+        }catch (BadResponseException|Exception $e) {
+            return back()->with('failed' , 'Can not create meeting :' . $e->getMessage());
+        }
+    }
+
+    private function updateStatus(Meeting $meeting , string $status)
+    {
+        # change Meeting Status in our Database
+        $meeting->update([
+            'status' => $status
+        ]);
+    }
+
+
+    private function endMeetingEnvironment(Meeting $meeting)
+    {
+        $meetingData = unserialize($meeting->meeting_data);
+
+        if(Auth::user()->id !== $meeting->user_id)
+            return back()->with('failed' , 'You are Not this Meeting Moderator');
+
+        # End the session both through the bbb environment and the end button on the single page
+        $response = $this->bbb->endMeeting(
+            $meetingData['meetingId'] ,
+            $meeting->title,
+            $meetingData['moderatorPassword']);
+
+        if ($response->getReturnCode() === 'FAILED')
+            return back()->with('failed' , $response->getMessage());
+    }
 }
