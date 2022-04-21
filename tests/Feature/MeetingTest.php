@@ -44,4 +44,18 @@ class MeetingTest extends TestCase
 
         $this->assertDatabaseHas('meetings' , ['title' => 'Test New Meeting']);
     }
+
+    public function testThatStoreNewMeetingInDatabaseWithIncorrectInfo()
+    {
+        $user = User::factory()->create();
+        $response = $this->actingAs($user)->post(route('meetings.store'),[
+            'title' => '',
+            'user_id' => $user->id,
+            'meeting_data' => '',
+            'start-dateTime' => now(),
+            'during-time' => 20
+        ])->isInvalid();
+
+        $this->assertDatabaseMissing('meetings' , ['title' => 'Test New Meeting']);
+    }
 }
