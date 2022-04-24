@@ -27,6 +27,7 @@ class MeetingsController extends Controller
     public function index(): View
     {
         $meetings = Meeting::query()
+            ->with('user')
             ->orderByDesc('created_at')
             ->paginate(12);
 
