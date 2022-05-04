@@ -1,5 +1,8 @@
 /node_modules
 /public/hot
+/bootstrap
+/lang
+/public
 /public/storage
 /storage/*.key
 /vendor
