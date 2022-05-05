@@ -1,4 +1,3 @@
-![Alt Image text](Asan-Seminar.png?raw=true "Optional Title")
 
 ## A Platform for create  Scheduler for Online Meeting in BBB
 

@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Meetings;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Meetings\StoreMeetRequest;
 use App\Http\Requests\Meetings\UpdateMeetRequest;
-use App\Models\Attendance;
 use App\Models\Meeting;
-use App\Repositories\MeetingRepository;
+use App\Repositories\MeetingRepository\MeetingRepository;
+use App\Repositories\MeetingRepository\MeetingRepositoryInterface;
 use Hashids\Hashids;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use function view;
@@ -19,6 +17,13 @@ use function view;
 
 class MeetingsController extends Controller
 {
+    private MeetingRepositoryInterface $meetingRepository;
+
+
+    public function __construct(MeetingRepositoryInterface $meetingRepository)
+    {
+        $this->meetingRepository = $meetingRepository;
+    }
 
 
     /**
@@ -53,7 +58,7 @@ class MeetingsController extends Controller
     {
         $trustedData = $request->validated();
         try {
-            resolve(MeetingRepository::class)->create($trustedData);
+            $this->meetingRepository->create($trustedData);
         }catch(ValidationException $e){
             return back()->with('failed' , 'Session Not Created Successfully : ' . $e->getMessage());
         }
@@ -92,7 +97,7 @@ class MeetingsController extends Controller
     {
         $trustedData = $request->validated();
         try {
-            resolve(MeetingRepository::class)->update($meeting, $trustedData);
+            $this->meetingRepository->update($meeting, $trustedData);
         }catch (ValidationException $e) {
             return back()->with('failed' , 'Session Not Created Successfully : ' . $e->getMessage());
         }
@@ -119,7 +124,7 @@ class MeetingsController extends Controller
      */
     public function setGuestLink(Meeting $meeting): RedirectResponse
     {
-        $guestLink = resolve(MeetingRepository::class)->makeGuestLink($meeting);
+        $guestLink = $this->meetingRepository->makeGuestLink($meeting);
 
         $meeting->update([
             'guest_link' => $guestLink,

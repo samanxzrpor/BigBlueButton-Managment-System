@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\MeetingRepository;
 
 use App\Models\Meeting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use function env;
 
-class MeetingRepository
+class MeetingRepository implements MeetingRepositoryInterface
 {
 
     public function create(array $data): void
